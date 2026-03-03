@@ -28,16 +28,26 @@ type Res struct {
 	message string
 }
 
+var PATH = "./serve";
+
 func main() {
+	argv := os.Args[1:];
+
+	if len(argv) > 0 {
+		PATH = argv[0];
+	}
+
 	listener, err := net.Listen("tcp", ":1979");
 	if err != nil {
-		panic(err);
+		fmt.Fprintf(os.Stderr, "ERROR: could not listen: %v\n", err);
+		os.Exit(1);
 	}
 
 	for {
 		conn, err := listener.Accept();
 		if err != nil {
-			panic(err);
+			fmt.Fprintf(os.Stderr, "ERROR: could not accept the connection: %v\n", err);
+			os.Exit(1);
 		}
 
 		go handleConnection(conn);
@@ -53,7 +63,7 @@ func handleConnection(conn net.Conn) {
 		if err == io.EOF {
 			return;
 		}
-		fmt.Fprintf(os.Stderr, "error -> %v\n", err);
+		fmt.Fprintf(os.Stderr, "ERROR: %v\n", err);
 		return;
 	}
 
@@ -67,12 +77,10 @@ func handleConnection(conn net.Conn) {
 func getResponse(req Req) Res {
 	var res Res;
 
-	const path string = "./test"; // HADRCODED PATH ON THE WRONG PLACE.
-
-	files, err := readDirFromPath(path);
+	files, err := readDirFromPath(PATH);
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error -> %v\n", err);
-		return Res{}; // TODO: Handle this
+		fmt.Fprintf(os.Stderr, "ERROR: could not read the dir %v\n", err);
+		return Res{}; 
 	}
 
 	found := files[req.path[1:]];
@@ -82,7 +90,7 @@ func getResponse(req Req) Res {
 		return res;
 	}
 
-    dat, err := os.ReadFile(path+req.path);
+    dat, err := os.ReadFile(PATH+req.path);
 	if err != nil {
 		res.message = fmt.Sprintf("could not open the file: %v\n", req.path);
 		res.code = CodeError;
@@ -100,7 +108,7 @@ func parseRequest(req string) Req {
 	path := strings.TrimSpace(splitted[1]);
 
 	if strings.HasSuffix(path, "/") {
-		path += "main.txt";
+		path += "main.tip";
 	}
 	return Req{addr, path};
 }
