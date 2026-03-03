@@ -1,7 +1,7 @@
 # tip protocol
 
 a simple tcp/ip protocol, focused on simplicity. something in between nex and spartan.
-but with no virtual hosting, and domains in general.
+but with no virtual hosting, and no domains in general.
 
 *this is just a hobby project, and is still in development.
 
