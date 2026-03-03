@@ -33,3 +33,8 @@ code\ncontent
 - 0 -> success
 - 1 -> redirect
 - 2 -> error
+
+
+# todo
+- mimetypes
+- redirects
